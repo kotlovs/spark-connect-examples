@@ -1,0 +1,41 @@
+plugins {
+    id "java-library"
+    id "scala"
+    id 'com.github.johnrengelman.shadow' version "8.1.0"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.spark:spark-connect-client-jvm_2.12:3.5.3'
+    implementation 'org.apache.spark:spark-catalyst_2.12:3.5.3'
+    implementation 'org.apache.spark:spark-hive_2.12:3.5.3'
+    implementation 'org.apache.hadoop:hadoop-aws:3.3.4'
+
+    implementation 'org.scala-lang:scala-library:2.12.17'
+    implementation 'org.scala-lang:scala-compiler:2.12.17'
+}
+
+shadowJar {
+    zip64 true
+    mergeServiceFiles()
+    ext.standalone = true
+}
+
+def dockerImageName = 'jfrog.joom.it/datasci/analytics/spark-connect-client'
+def dockerImageTag = '0.0.1'
+def dockerFullImageName = "$dockerImageName:$dockerImageTag"
+
+task createCrossBilder(type: Exec) {
+    executable = 'docker'
+    args('buildx', 'create', '--name', 'spark-connect-builder', '--node', 'cross-builder', '--driver', 'docker-container', '--bootstrap', '--platform', 'linux/amd64,linux/arm64')
+}
+
+task buildDockerImage(type: Exec) {
+    dependsOn shadowJar
+    dependsOn createCrossBilder
+    executable = 'docker'
+    args('buildx', 'build', '--builder', 'spark-connect-builder', '--platform', 'linux/amd64', '-f', 'src/main/docker/Dockerfile', '-t', dockerFullImageName, '.', '--push')
+}

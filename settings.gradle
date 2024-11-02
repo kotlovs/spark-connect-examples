@@ -1,0 +1,3 @@
+rootProject.name = 'spark-connect-examples'
+
+include ':spark-connect-client-image'
