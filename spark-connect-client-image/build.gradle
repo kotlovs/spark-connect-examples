@@ -24,7 +24,7 @@ shadowJar {
     ext.standalone = true
 }
 
-def dockerImageName = 'jfrog.joom.it/datasci/analytics/spark-connect-client'
+def dockerImageName = '<your_docker_repository>/analytics/spark-connect-client'
 def dockerImageTag = '0.0.1'
 def dockerFullImageName = "$dockerImageName:$dockerImageTag"
 
