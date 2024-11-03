@@ -4,8 +4,6 @@
 .gradle
 build/
 
-gradle/wrapper/
-
 ### IntelliJ ###
 *.iml
 *.ipr
